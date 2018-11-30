@@ -1,0 +1,13 @@
+RewriteEngine On
+
+DirectoryIndex index.php
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /cheese_dev/public_html/
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /cheese_dev/public_html/index.php [L]
+</IfModule>
+#RewriteRule ^(.*)$ index.php?url=%{REQUEST_URI}
+#RewriteRule ^(.*)/$ index.php?url=%{REQUEST_URI}
