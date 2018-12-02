@@ -2,47 +2,30 @@
 /** 
  *
  */
-class Content extends Item {
+class Content {
 
-	public static $table_key = 'ch_content';
-	public static $table_language_key = 'ch_content_lang';
-	public static $table_language_join_key = 'content_id';
-
-	public function __construct($_id=null,$_lang=false) {
+	public function __construct() {
 		
-		if($_lang){
-			parent::$lang_code=$_lang;
-		}
-
-        parent::$db_table = self::$table_key;
-        parent::$db_lang_table = self::$table_language_key;
-        parent::$table_language_join_key = self::$table_language_join_key;
-
-        if(intval($_id)){
-        	parent::__construct($_id);
-        }
 	}
 
-	public static function getContentByUrl($_url=false,$_lang){
+	// public static function getContentByUrl($url=false,$lang=false){
 		
-		if($_lang){
-			parent::$lang_code=$_lang;
-		}
-		if(!isset(parent::$lang_code)){
-			parent::$lang_code = Cheese::$data->language->current->code;
-		}
+	// 	if($lang){
+	// 		parent::$lang=$lang;
+	// 	}
+	// 	if(!isset(parent::$lang)){
+	// 		parent::$lang = Core::$language::$current;
+	// 	}
 
-		if(!empty($_url) && isset(parent::$lang_code)){
+	// 	if(!empty($url) && isset(parent::$lang)){
 
-			$q = new Db();
-
-			if($result = $q->sql('SELECT '.self::$table_language_join_key.' FROM '.self::$table_language_key.' WHERE language="'.parent::$lang_code.'" AND url="'.trim(stripslashes($_url)).'" LIMIT 1')){
-				return new Content($result->{self::$table_language_join_key});;
-			}
-		}
+	// 		if($result = Db::fetch_object('SELECT '.self::$table_language_join_key.' FROM '.self::$table_language_key.' WHERE language="'.parent::$lang.'" AND url="'.trim(stripslashes($url)).'" LIMIT 1')){
+	// 			return new Self( $result->{self::$table_language_join_key} );
+	// 		}
+	// 	}
 		
-		return false;
-	}
+	// 	return false;
+	// }
 	
 }
 ?>

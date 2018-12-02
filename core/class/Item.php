@@ -9,7 +9,7 @@ class Item {
     public static $data_lang; // Db_Row object 
     public static $db_lang_table; // Db table for language : optional
     public static $table_language_join_key; // Key joining main table and language table : optional
-    public static $lang_code; // required, if not set -> is set from default system language
+    public static $lang; // required, if not set -> is set from default system language
 
     public $tools;
 
@@ -17,13 +17,13 @@ class Item {
 
         $this->tools = new Content_Tools();
 
-        if(self::$lang_code){
-            $this->setLanguage(self::$lang_code);
+        if(self::$lang){
+            $this->setLanguage(self::$lang);
         }else{
-            $this->setLanguage(Cheese::$data->language->current->code);
+            $this->setLanguage(Core::$language->current);
         }
         
-        if(self::$db_table && self::$lang_code) {
+        if(self::$db_table && self::$lang) {
 
             $this->data = new Db_Row(self::$db_table);
 
@@ -38,7 +38,7 @@ class Item {
 
                         $this->data_lang = new Db_Row(self::$db_lang_table);
 
-                        $this->data_lang->row = $this->data_lang->fetch(self::$table_language_join_key.'='.intval($_id).' AND language="'.$this->lang_code.'"');
+                        $this->data_lang->row = $this->data_lang->fetch(self::$table_language_join_key.'='.intval($_id).' AND language="'.$this->lang.'"');
                       
                         if(!$this->data_lang->row->id){
                             $this->data_lang->newRow();
@@ -70,7 +70,7 @@ class Item {
 
    
     public function setLanguage($lang){
-        $this->lang_code = $lang;
+        $this->lang = $lang;
     }
 
     public function getId() {

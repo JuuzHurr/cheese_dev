@@ -1,51 +1,40 @@
 <?php
 
-class Db_Row {
+class Db_Row extends Db {
 
-	private $_table;
-	private $_table_columns;
+	public $table;
+	public $table_columns;
 	public $row;
 
-	function __construct($_table=false){
-
-		$this->db = new Db();
+	function __construct($table=false){
 		$this->row = new StdClass();
-
-		$this->_table = $_table;
-
+		$this->table = $table;
 	}
 
-	public function getRow(){
+	public function get(){
 		return $this->row;
 	}
 
-	public function setRow($row){
+	public function set($row){
 		$this->row = $row;
 	}
 
-	public function newRow(){
+	public function new(){
 		$this->row->id = null;
 	}
 
-	public function saveRow(){
+	public function save(){
 
 		if(intval($this->row->id)){
-			$this->_update();
+			$this->update();
 		}else{
-			$this->_insert();
-		}
-	}
-
-	public function deleteRow(){
-
-		if(intval($this->row->id)){
-			$this->_delete();
+			$this->insert();
 		}
 	}
 
 	public function fetch($where_clause='',$return_columns='',$limit='',$order_by=''){
 
-		if(isset($this->_table)){
+		if(isset($this->table)){
 
 			$s_clause = '';
 
@@ -67,15 +56,15 @@ class Db_Row {
 				$s_clause .= ' LIMIT '.intval($limit);
 			}
 
-			$this->row = $this->db->sql('SELECT '.$columns.' FROM '.$this->_table.$s_clause);
+			$this->row = parent::fetch_object('SELECT '.$columns.' FROM '.$this->table.$s_clause);
 
 			return $this->row;
 		}
 	}
 
-	private function _update(){
+	public function update(){
 		
-		if(isset($this->_table) && isset($this->row->id)){
+		if(isset($this->table) && isset($this->row->id)){
 
 			$set_clause = '';
 
@@ -83,15 +72,15 @@ class Db_Row {
 
 			if(is_array($row_vars) && count($row_vars) > 0){
 
-				if(!isset($this->_table_columns)){
-					$this->_table_columns = $this->db->getTableColumns($this->_table);
+				if(!isset($this->table_columns)){
+					$this->table_columns = parent::getTableColumns($this->table);
 				}
 
 				foreach ($row_vars as $key => $value) {
 
 					if($key != "id"){
 
-						if(in_array($key, $this->_table_columns)){
+						if(in_array($key, $this->table_columns)){
 
 							if(gettype($value) == 'string' || gettype($value) == 'blob' || gettype($value) == 'datetime') {
 
@@ -108,7 +97,7 @@ class Db_Row {
 								$set_clause .= $key.' = '.$value.', ';
 							}
 						}else{
-							trigger_error("Db_Row : _insertRow : column ".$key." wasn't not found in table ".$this->_table." and didn't save.");
+							trigger_error("Db_Row : insertRow : column ".$key." wasn't not found in table ".$this->table." and didn't save.");
 						}
 					}
 				}
@@ -118,7 +107,7 @@ class Db_Row {
 			$set_clause = substr($set_clause,0,strlen($set_clause)-1);
 			
 			if(!empty($set_clause)){
-				return $this->db->sql('UPDATE '.$this->_table.' SET '.$set_clause.' WHERE id = '.$this->row->id);
+				return parent::execute('UPDATE '.$this->table.' SET '.$set_clause.' WHERE id = '.$this->row->id);
 			}
 
 		}
@@ -126,9 +115,9 @@ class Db_Row {
 		return false;
 	}
 
-	private function _insert(){
+	public function insert(){
 		
-		if(isset($this->_table)){
+		if(isset($this->table)){
 
 			$col_clause = '';
 			$value_clause = '';
@@ -137,13 +126,13 @@ class Db_Row {
 
 			if(is_array($row_vars) && count($row_vars) > 0){
 
-				if(!isset($this->_table_columns)){
-					$this->_table_columns = $this->db->getTableColumns($this->_table);
+				if(!isset($this->table_columns)){
+					$this->table_columns = parent::getTableColumns($this->table);
 				}
 
 				foreach ($row_vars as $key => $value) {
 
-					if(in_array($key, $this->_table_columns)){
+					if(in_array($key, $this->table_columns)){
 
 						if($key == "id"){
 							$col_clause .= $key.',';
@@ -169,7 +158,7 @@ class Db_Row {
 							}
 						}
 					}else{
-						trigger_error("Db_Row : _insertRow : column ".$key." wasn't not found in table ".$this->_table." and didn't save.");
+						trigger_error("Db_Row : insertRow : column ".$key." wasn't not found in table ".$this->table." and didn't save.");
 					}
 				}
 			}
@@ -181,17 +170,17 @@ class Db_Row {
 			$value_clause = substr($value_clause,0,strlen($value_clause)-1);
 
 			if(!empty($col_clause) && !empty($value_clause)){
-				return $this->db->sql('INSERT INTO '.$this->_table.'('.$col_clause.') VALUES ('.$value_clause.')');
+				return parent::execute('INSERT INTO '.$this->table.'('.$col_clause.') VALUES ('.$value_clause.')');
 			}
 		}
 
 		return false;
 	}
 
-	private function _delete(){
+	public function delete(){
 		
-		if(isset($this->_table) && intval($this->row->id)){
-			return $this->db->sql('DELETE FROM '.$this->_table.' WHERE id='.intval($this->row->id));
+		if(isset($this->table) && intval($this->row->id)){
+			return parent::execute('DELETE FROM '.$this->table.' WHERE id='.intval($this->row->id));
 		}
 
 		return false;

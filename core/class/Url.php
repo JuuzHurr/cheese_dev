@@ -8,8 +8,11 @@
 class Url {
 
 	public $url;
-	public $path;
-	public $params;
+	public $a_path;
+
+	public $url_params;
+	public $a_params;
+	
 	public $lang_module;
 	
 	function __construct( $url=false ) {
@@ -34,13 +37,17 @@ class Url {
 	}
 
 	public function parse(){
+
 		if( isset($this->url) ){
+
 			$this->url = Url_Handler::clean( $this->url );
-			$this->path = Url_Handler::parsePath( $this->url );
-			$this->params = Url_Handler::parseParams( $this->url );
+			$this->url_params = Url_Handler::parseUrlParams( $this->url );
+			$this->url = Url_Handler::parseUrl( $this->url, $this->url_params );
+			$this->a_path = Url_Handler::parsePath( $this->url );
+			$this->a_params = Url_Handler::parseParams( $this->url_params );
 			$this->lang_module = Url_Handler::parseLangModule( $this->url );
 
-			$this->path = str_replace($this->lang_module.'/', '', $this->path);
+			//$this->a_path = str_replace($this->lang_module.'/', '', $this->path);
 		}
 	}
 

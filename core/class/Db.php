@@ -16,11 +16,15 @@ class Db {
 		
 	}
 
-	public static function sql($query) {
+	public static function set_query($query) {
 		self::$query = $query;
 	}
 
-	public static function fetch() {
+	public static function fetch_object($query='') {
+
+		if(!empty($query)){
+			self::set_query($query);
+		}
 
 		if(isset(self::$query)){
 
@@ -47,7 +51,11 @@ class Db {
 		
 	}
 	
-	private function execute(){
+	public static function execute($query=''){
+
+		if(!empty($query)){
+			self::set_query($query);
+		}
 
 		if(isset(self::$query)){
 
@@ -58,7 +66,34 @@ class Db {
 				// Query execution
 				if(!$stmt->execute()) {
 				    trigger_error("Execute failed: (" . $stmt->errno . ") " . $stmt->error);
-				    $stmt->close();
+				    return false;
+				}
+				$stmt->close();
+				return true;
+			}
+
+		} return false;
+	}
+
+	public static function getTableColumns($_table){
+
+		if(!empty($_table)){
+
+			self::set_query('SHOW COLUMNS FROM '.$_table);
+
+			if( $stmt = self::$mysqli->prepare(self::$query) ){
+				if( $stmt->execute() ){
+
+					$columns = array();
+					$results = $stmt->get_result();
+
+					while($result = $results->fetch_assoc()) {
+						$columns[] = $result['Field'];
+					}
+					
+					$stmt->close();
+
+					return $columns;
 				}
 			}
 

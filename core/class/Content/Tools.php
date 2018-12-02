@@ -3,7 +3,7 @@
  * 
  */
 
-class Content_Tools{
+class Content_Tools {
 
 	public static function prepareFormData($obj){
 		
